@@ -55,6 +55,24 @@ def savewav(id):
 # ただし、SELECT 文などの読み取り専用操作の場合は通常コミットが不要です。
 
 
+def savea2t(id):
+    print("INFO: save audio2text culumn as id.txt")
+    session = dbquery.create_session()
+    r = dbquery.find_one_by_id(DialogRecord, id)
+
+    if r is None:
+        print(f"INFO: record is not found {id}")
+        return
+
+    # 結果の表示
+    print(r.id, r.status, r.audio2text, r.text2advice)
+    with open(f"{id}.txt", 'w') as file:
+        file.write(r.audio2text)
+
+    session.close()
+    print("INFO: End")
+
+
 def main():
     descstr = 'DB Operation Tool for advsvc'
     parser = argparse.ArgumentParser(description=descstr)
@@ -63,6 +81,7 @@ def main():
     parser.add_argument('--initdb', action='store_true', help='Initialize db')
     parser.add_argument('--listrec', action='store_true', help='list records')
     parser.add_argument('--savewav', type=int, help='save wav by id')
+    parser.add_argument('--savea2t', type=int, help='save audio2text by id')
 
     args = parser.parse_args()
 
@@ -83,6 +102,11 @@ def main():
 
     if args.savewav is not None:
         savewav(args.savewav)
+        return
+
+    # saving audio2text column of id(record==args.savea2t)
+    if args.savea2t is not None:
+        savea2t(args.savea2t)
         return
 
 
