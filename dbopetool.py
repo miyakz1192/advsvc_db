@@ -17,16 +17,30 @@ def init_db():
     print("INFO: End")
 
 
+def drop_all():
+    dbinitializer.drop_all()
+
+
 def listrec():
     print("INFO: List All records in DB")
     session = dbquery.create_session()
     all_records = session.query(DialogRecord).all()
     # 結果の表示
     for r in all_records:
-        print(f"RECORD={r.id}")
-        print(r.id, r.status, r.audio2text, r.text2advice)
+        # print(f"RECORD={r.id}")
+        print(f"ID={r.id},STATUS={r.status},A2T={r.audio2text},T2A={r.text2advice},Time={r.timestamp}")
     session.close()
     print("INFO: End")
+
+
+def listt2anone():
+    session = dbquery.create_session()
+    all_records = session.query(DialogRecord).all()
+    # 結果の表示
+    for r in all_records:
+        if r.text2advice is None:
+            print(f"{r.id}")
+    session.close()
 
 
 def savewav(id):
@@ -80,8 +94,10 @@ def main():
     # ロングオプション
     parser.add_argument('--initdb', action='store_true', help='Initialize db')
     parser.add_argument('--listrec', action='store_true', help='list records')
+    parser.add_argument('--listt2anone', action='store_true', help='list text to advice is none')
     parser.add_argument('--savewav', type=int, help='save wav by id')
     parser.add_argument('--savea2t', type=int, help='save audio2text by id')
+    parser.add_argument('--dropall', action='store_true', help='drop table all')
 
     args = parser.parse_args()
 
@@ -100,9 +116,16 @@ def main():
         listrec()
         return
 
+    if args.listt2anone:
+        listt2anone()
+        return
+
     if args.savewav is not None:
         savewav(args.savewav)
         return
+
+    if args.dropall is not None:
+        drop_all()
 
     # saving audio2text column of id(record==args.savea2t)
     if args.savea2t is not None:
