@@ -23,3 +23,7 @@ def init_db():
     # associate model and engine
     # initialize table
     Base.metadata.create_all(bind=engine)
+
+def drop_all():
+    engine = create_engine()
+    Base.metadata.drop_all(bind=engine)
