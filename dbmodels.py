@@ -26,7 +26,10 @@ class DialogRecord(Base):
                        nullable=False)
     status = Column(String)
     audio2text = Column(String)
+    # whole of response(prompt+advice)
     text2advice = Column(String)
+    # advice only
+    text2advice_only = Column(String)
     raw_audio = Column(LargeBinary)
     advice_audio = Column(LargeBinary)
     version = Column(BigInteger, nullable=False)
