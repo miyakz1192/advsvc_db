@@ -28,7 +28,18 @@ def listrec():
     # 結果の表示
     for r in all_records:
         # print(f"RECORD={r.id}")
-        print(f"ID={r.id},STATUS={r.status},A2T={r.audio2text},T2A={r.text2advice},Time={r.timestamp}")
+        print(f"ID={r.id},STATUS={r.status},A2T={r.audio2text},T2AF={r.text2advice_full},T2A={r.text2advice},Time={r.timestamp}")
+    session.close()
+    print("INFO: End")
+
+
+def listrecsum():
+    print("INFO: List All records in DB")
+    session = dbquery.create_session()
+    all_records = session.query(SummaryRecord).all()
+    # 結果の表示
+    for r in all_records:
+        print(f"ID={r.id},SUMMARY={r.advice2summary}")
     session.close()
     print("INFO: End")
 
@@ -94,6 +105,7 @@ def main():
     # ロングオプション
     parser.add_argument('--initdb', action='store_true', help='Initialize db')
     parser.add_argument('--listrec', action='store_true', help='list records')
+    parser.add_argument('--listrecsum', action='store_true', help='list records(summary)')
     parser.add_argument('--listt2anone', action='store_true', help='list text to advice is none')
     parser.add_argument('--savewav', type=int, help='save wav by id')
     parser.add_argument('--savea2t', type=int, help='save audio2text by id')
@@ -114,6 +126,10 @@ def main():
 
     if args.listrec:
         listrec()
+        return
+
+    if args.listrecsum:
+        listrecsum()
         return
 
     if args.listt2anone:

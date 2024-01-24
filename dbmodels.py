@@ -40,3 +40,20 @@ class DialogRecord(Base):
     def __init__(self):
         self.uuid = str(uuid.uuid4())
         self.status = DialogRecord.Status.INIT
+
+
+class SummaryRecord(Base):
+    __tablename__ = 'summaries'
+
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String)
+    timestamp = Column(DateTime, default=func.current_timestamp(),
+                       nullable=False)
+    advice2summary = Column(String)
+    version = Column(BigInteger, nullable=False)
+    # for optimistic lock
+    __mapper_args__ = {'version_id_col': version}
+#    version = Column(Integer, default=0, server_default='0', onupdate=1)
+
+    def __init__(self):
+        self.uuid = str(uuid.uuid4())
