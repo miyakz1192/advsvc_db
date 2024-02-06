@@ -5,6 +5,7 @@ import argparse
 import dbinitializer
 import dbquery
 from dbmodels import *
+from datetime import datetime
 
 
 engine = dbinitializer.create_engine()
@@ -33,13 +34,44 @@ def listrec():
     print("INFO: End")
 
 
+def listsumnone():
+    print("INFO: List Summary is none or insufficient")
+    session = dbquery.create_session()
+    all_records = session.query(DialogRecord).all()
+    
+    res = {}
+    # TODO: FIXME: this code is low performance maybe. improve...
+    # 結果の表示
+    for r in all_records:
+        # print(f"RECORD={r.id}")
+        if r.text2advice is None:
+            continue
+        year = r.timestamp.year
+        month = r.timestamp.month
+        day = r.timestamp.day
+
+        summaries = dbquery.find_by_day(SummaryRecord, year, month, day) 
+        if summaries is not None:
+            for s in summaries:
+                if s.advice2summary is not None:
+                    continue
+                res[(year,month,day)] = s.id
+
+    session.close()
+
+    for _, v in res.items():
+        print(f"ID={v}")
+
+    print("INFO: End")
+
+
 def listrecsum():
     print("INFO: List All records in DB")
     session = dbquery.create_session()
     all_records = session.query(SummaryRecord).all()
     # 結果の表示
     for r in all_records:
-        print(f"ID={r.id},SUMMARY={r.advice2summary}")
+        print(f"ID={r.id},SUMMARY={r.advice2summary},Time={r.timestamp}")
     session.close()
     print("INFO: End")
 
@@ -50,7 +82,7 @@ def listt2anone():
     # 結果の表示
     for r in all_records:
         if r.text2advice is None:
-            print(f"{r.id}")
+            print(f"ID={r.id}")
     session.close()
 
 
@@ -107,6 +139,7 @@ def main():
     parser.add_argument('--listrec', action='store_true', help='list records')
     parser.add_argument('--listrecsum', action='store_true', help='list records(summary)')
     parser.add_argument('--listt2anone', action='store_true', help='list text to advice is none')
+    parser.add_argument('--listsumnone', action='store_true', help='list summary is not none or insufficient')
     parser.add_argument('--savewav', type=int, help='save wav by id')
     parser.add_argument('--savea2t', type=int, help='save audio2text by id')
     parser.add_argument('--dropall', action='store_true', help='drop table all')
@@ -134,6 +167,10 @@ def main():
 
     if args.listt2anone:
         listt2anone()
+        return
+
+    if args.listsumnone:
+        listsumnone()
         return
 
     if args.savewav is not None:
