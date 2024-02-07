@@ -86,6 +86,17 @@ def listt2anone():
     session.close()
 
 
+def lista2tnone():
+    session = dbquery.create_session()
+    all_records = session.query(DialogRecord).all()
+    # 結果の表示
+    for r in all_records:
+        if r.audio2text is None and \
+           r.status == DialogRecord.Status.AUDIO2TEXT_START:
+            print(f"ID={r.id}")
+    session.close()
+
+
 def savewav(id):
     print("INFO: save wav file as id.wav")
     session = dbquery.create_session()
@@ -140,6 +151,7 @@ def main():
     parser.add_argument('--listrecsum', action='store_true', help='list records(summary)')
     parser.add_argument('--listt2anone', action='store_true', help='list text to advice is none')
     parser.add_argument('--listsumnone', action='store_true', help='list summary is not none or insufficient')
+    parser.add_argument('--lista2tnone', action='store_true', help='list AUDIO2TEXT_START but audio2text is none')
     parser.add_argument('--savewav', type=int, help='save wav by id')
     parser.add_argument('--savea2t', type=int, help='save audio2text by id')
     parser.add_argument('--dropall', action='store_true', help='drop table all')
@@ -171,6 +183,10 @@ def main():
 
     if args.listsumnone:
         listsumnone()
+        return
+
+    if args.lista2tnone:
+        lista2tnone()
         return
 
     if args.savewav is not None:
